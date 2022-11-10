@@ -41,10 +41,6 @@ func Nothing[T any]() Maybe[T] {
 	return Maybe[T]{}
 }
 
-// func Curry[T any, U any](f func(T, U, ...any), value T) func(U, ...any) {
-
-// }
-
 func Fmap[T any, U any](f func(T) U) func(Maybe[T]) Maybe[U] {
 	return func(m Maybe[T]) Maybe[U] {
 		if m.IsJust() {
@@ -67,4 +63,12 @@ func Monad[T any, U any](m Maybe[T]) func(func(T) Maybe[U]) Maybe[U] {
 	return func(f func(T) Maybe[U]) Maybe[U] {
 		return Join(Fmap(f)(m))
 	}
+}
+
+func AndThen[T any, U any](m Maybe[T], callback func(T) Maybe[U]) Maybe[U] {
+	if m.IsNothing() {
+		return Nothing[U]()
+	}
+
+	return callback(m.Unwrap())
 }
